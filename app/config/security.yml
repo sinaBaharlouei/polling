@@ -1,0 +1,58 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+
+    encoders:
+      UserBundle\Entity\User:
+        algorithm: sha512
+        encode_as_base64: false
+        iterations: 2
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN]
+
+
+    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    providers:
+        user:
+          entity: { class: UserBundle\Entity\User, property: email }
+
+        in_memory:
+            memory:
+                users:
+                    user:  { password: userpass, roles: ROLE_USER }
+
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        user_login:
+            pattern: ^/user/login$
+            provider: user
+            anonymous: ~
+
+        user_register:
+            pattern: ^/user/register$
+            provider: user
+            anonymous: ~
+
+        # secures part of the application
+        user:
+            pattern: ^/user/
+            provider: user
+            anonymous: ~
+            form_login:
+                login_path: user_auth_login
+                check_path: user_auth_login_check
+                default_target_path: user_auth_target
+            logout:
+                path: user_auth_logout
+                target: user_auth_login
+
+    access_control:
+        - { path: ^/user/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/user/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }

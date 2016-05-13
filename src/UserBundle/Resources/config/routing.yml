@@ -1,0 +1,7 @@
+user_auth:
+    resource: "@UserBundle/Controller/AuthenticationController.php"
+    type:     annotation
+    prefix:   /
+
+user_login_check:
+    path: /login_check
